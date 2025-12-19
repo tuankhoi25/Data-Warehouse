@@ -1,0 +1,1 @@
+-- Lưu data lịch sử

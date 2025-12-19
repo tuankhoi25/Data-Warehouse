@@ -1,0 +1,12 @@
+# macOS system files
+.DS_Store
+
+# Postgres Dataset
+data_source/postgres/*
+
+# Virtual Environment
+.venv/
+
+# Operation Logs
+dbt_airflow/logs/*
+dbt_airflow/target/*

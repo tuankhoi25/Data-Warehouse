@@ -1,0 +1,8 @@
+name: dwh_project
+
+config-version: 2
+
+profile: profiles
+
+model-paths: ["models"]
+test-paths: ["tests"]
