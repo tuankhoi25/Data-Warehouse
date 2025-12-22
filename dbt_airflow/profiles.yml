@@ -1,10 +1,9 @@
-# profiles.yml
 profiles:
   target: dev
   outputs:
     dev:
       type: clickhouse
-      schema: db_in_ch
+      schema: default
       host: localhost
       port: 8123
       user: default

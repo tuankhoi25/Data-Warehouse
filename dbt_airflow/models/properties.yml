@@ -1,6 +1,0 @@
-# models/properties.yml
-sources:
-  - name: clickhouse
-    schema: db_in_ch  
-    tables:
-      - name: staging_category

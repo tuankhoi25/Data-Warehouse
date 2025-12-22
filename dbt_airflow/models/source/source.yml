@@ -1,0 +1,200 @@
+version: 2
+
+sources:
+  - name: postgres
+    schema: postgres
+    tables:
+      - name: customer
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: name
+            tests:
+              - not_null
+          - name: sex
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['M', 'F', NULL]
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: location
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: zipcode
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 1
+                  max_value: 99999
+          - name: country
+            tests:
+              - not_null
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: customer_location
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('postgres', 'customer')
+                  field: id
+          - name: location_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('postgres', 'location')
+                  field: id
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: phone_number
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: phone_number
+            tests:
+              - not_null
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: customer_phone
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('postgres', 'customer')
+                  field: id
+          - name: phone_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('postgres', 'phone_number')
+                  field: id
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: shadow_product
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: product_id
+            tests:
+              - not_null
+          - name: product_title
+            tests:
+              - not_null
+          - name: currency
+            tests:
+              - not_null
+          - name: price
+            tests:
+              - not_null
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: category
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: category_name
+            tests:
+              - unique
+              - not_null
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: product_category
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          # - name: category_id
+          #   tests:
+          #     - not_null
+          #     - relationships:
+          #         to: source('postgres', 'category')
+          #         field: id
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
+
+      - name: review
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            tests:
+              - not_null
+              - relationships:
+                  to: source('postgres', 'customer')
+                  field: id
+          - name: star_rating
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['1', '2', '3', '4', '5', NULL]
+          - name: helpful_votes
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+          - name: total_votes
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+          - name: marketplace
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['US']
+          - name: verified_purchase
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['Y', 'N', NULL]
+          - name: updated_at
+            tests:
+              - dbt_utils.expression_is_true:
+                  expression: "IS NULL OR updated_at >= created_at"
