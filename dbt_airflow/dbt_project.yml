@@ -15,7 +15,7 @@ models:
       +incremental_strategy: append
       +schema: raw
     staging:
-      +materialized: table
+      +materialized: view
       +schema: staging
     intermediate:
       +materialized: table
