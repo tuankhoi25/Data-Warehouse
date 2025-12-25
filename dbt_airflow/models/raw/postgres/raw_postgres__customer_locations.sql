@@ -1,0 +1,21 @@
+{% set current_ingest_ts = get_current_ingestion_ts() %}
+
+WITH pg_customer_location AS (
+    SELECT * FROM {{ source('postgres', 'customer_location') }}
+)
+
+SELECT 
+    id,
+    customer_id,
+    location_id,
+    created_at,
+    updated_at,
+    {{ current_ingest_ts }} AS _ingested_at,
+    cast('{{ invocation_id }}', 'String') AS _batch_id
+FROM pg_customer_location
+WHERE 1=1
+
+{% if is_incremental() %}
+    AND updated_at > (SELECT max(updated_at) FROM {{ this }})
+    AND updated_at <= {{ current_ingest_ts }}
+{% endif %}

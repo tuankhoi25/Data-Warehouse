@@ -10,7 +10,7 @@ CREATE TABLE postgres.customer ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'customer', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_customer', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.location ON CLUSTER 'cluster_2S_2R' (
     id String,
@@ -22,7 +22,7 @@ CREATE TABLE postgres.location ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'location', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_location', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.customer_location ON CLUSTER 'cluster_2S_2R' (
     id UInt64,
@@ -31,7 +31,7 @@ CREATE TABLE postgres.customer_location ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'customer_location', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_customer_location', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.phone_number ON CLUSTER 'cluster_2S_2R' (
     id String,
@@ -39,7 +39,7 @@ CREATE TABLE postgres.phone_number ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'phone_number', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_phone_number', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.customer_phone ON CLUSTER 'cluster_2S_2R' (
     id UInt64,
@@ -48,7 +48,7 @@ CREATE TABLE postgres.customer_phone ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'customer_phone', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_customer_phone', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.shadow_product ON CLUSTER 'cluster_2S_2R' (
     id String,
@@ -59,7 +59,7 @@ CREATE TABLE postgres.shadow_product ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'shadow_product', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_shadow_product', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.category ON CLUSTER 'cluster_2S_2R' (
     id UInt64,
@@ -67,7 +67,7 @@ CREATE TABLE postgres.category ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'category', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_category', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.product_category ON CLUSTER 'cluster_2S_2R' (
     id UInt64,
@@ -76,7 +76,7 @@ CREATE TABLE postgres.product_category ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'product_category', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_product_category', 'clickhouse_user', 'clickhouse_password');
 
 CREATE TABLE postgres.review ON CLUSTER 'cluster_2S_2R' (
     id String,
@@ -92,4 +92,4 @@ CREATE TABLE postgres.review ON CLUSTER 'cluster_2S_2R' (
     created_at Nullable(DateTime),
     updated_at Nullable(DateTime)
 )
-ENGINE = PostgreSQL('postgres:5432', 'oltp', 'review', 'clickhouse_user', 'clickhouse_password');
+ENGINE = PostgreSQL('postgres:5432', 'oltp', 'dev_review', 'clickhouse_user', 'clickhouse_password');

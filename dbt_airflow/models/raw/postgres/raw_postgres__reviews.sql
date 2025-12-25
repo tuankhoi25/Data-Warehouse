@@ -1,3 +1,5 @@
+{% set current_ingest_ts = get_current_ingestion_ts() %}
+
 WITH pg_review AS (
     SELECT * FROM {{ source('postgres', 'review') }}
 )
@@ -15,10 +17,12 @@ SELECT
     review_body,
     created_at,
     updated_at,
-    now64(3) AS _ingested_at,
-    '{{ invocation_id }}' AS _batch_id
+    {{ current_ingest_ts }} AS _ingested_at,
+    cast('{{ invocation_id }}', 'String') AS _batch_id
 FROM pg_review
+WHERE 1=1
 
 {% if is_incremental() %}
-WHERE updated_at > (SELECT max(updated_at) FROM {{ this }})
+    AND updated_at > (SELECT max(updated_at) FROM {{ this }})
+    AND updated_at <= {{ current_ingest_ts }}
 {% endif %}

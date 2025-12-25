@@ -1,0 +1,33 @@
+version: 2
+
+macros:
+  - name: generate_dim_dates
+    description: >
+      Macro này tạo ra một model script (script tạo model) dữ liệu Dimension Date (Lịch) dựa trên khoảng thời gian 
+      bắt đầu và kết thúc được cung cấp. Nó sử dụng các hàm đặc thù của ClickHouse 
+      (toDate, dateDiff, numbers) để sinh dữ liệu.
+    arguments:
+      - name: start_date
+        type: string
+        description: "Ngày bắt đầu theo định dạng 'YYYY-MM-DD' (ví dụ: '2023-01-01')."
+      - name: end_date
+        type: string
+        description: "Ngày kết thúc theo định dạng 'YYYY-MM-DD' (ví dụ: '2023-12-31')."
+
+  - name: generate_schema_name
+    description: >
+      Đây là một macro mặc định của dbt được ghi đè (override) để thay đổi cách đặt tên schema.
+      Thay vì chỉ dùng custom_schema, nó sẽ nối thêm schema của target hiện tại vào trước.
+      Ví dụ: Nếu target schema là 'dev' và custom schema là 'sales', kết quả sẽ là 'dev_sales'.
+    arguments:
+      - name: custom_schema_name
+        type: string
+        description: "Tên schema tùy chỉnh được định nghĩa trong cấu hình model (config schema)."
+      - name: node
+        type: object
+        description: "Đối tượng node của dbt đại diện cho model đang được biên dịch."
+
+  - name: get_current_ingestion_ts
+    description: >
+      Macro này giúp lấy biến logical_date được truyền từ dbt run --var, cast thành datetime.
+      Đặc biệt dùng để nhận logical_date từ mỗi lần job chạy trên airflow

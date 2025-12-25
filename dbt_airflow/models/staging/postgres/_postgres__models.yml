@@ -1,0 +1,110 @@
+version: 2
+
+models:
+  - name: stg_postgres__customers
+    description: "Lớp staging chuẩn hoá dữ liệu khách hàng từ `raw_customer`. Chuyển đổi giá trị null và map giá trị `sex` thành mã số."
+    columns:
+      - name: customer_id
+        description: "ID khách hàng (từ `raw_customer.id`)."
+      - name: customer_name
+        description: "Tên khách hàng; null được thay bằng 'Unknown'."
+      - name: sex
+        description: "Giới tính mã hoá thành số (1=male,2=female,3=other)."
+      - name: mail
+        description: "Email khách hàng; null được thay bằng giá trị mặc định."
+      - name: birth_date
+        description: "Ngày sinh; null được thay bằng '1900-01-01'."
+      - name: signup_date
+        description: "Thời điểm tạo tài khoản (từ `raw_customer.created_at`)."
+
+  - name: stg_postgres__locations
+    description: "Lớp staging chuẩn hoá thông tin địa điểm từ `raw_location`. Điền giá trị mặc định cho các trường thiếu."
+    columns:
+      - name: location_id
+        description: "ID địa điểm (từ `raw_location.id`)."
+      - name: street_address
+        description: "Địa chỉ; null -> 'Unknown'."
+      - name: city
+        description: "Thành phố; null -> 'Unknown'."
+      - name: state
+        description: "Tỉnh/tiểu bang; null -> 'Unknown'."
+      - name: zipcode
+        description: "Mã bưu chính, được pad/truncate về định dạng chuỗi 6 ký tự."
+      - name: country
+        description: "Quốc gia; null -> 'Unknown'."
+
+  - name: stg_postgres__customer_locations
+    description: "Liên kết khách hàng - địa điểm lấy bản ghi mới nhất từ `raw_customer_location`."
+    columns:
+      - name: customer_location_id
+        description: "ID bản ghi customer-location (từ `raw_customer_location.id`)."
+      - name: customer_id
+        description: "ID khách hàng liên kết."
+      - name: location_id
+        description: "ID địa điểm liên kết."
+      - name: source_created_at
+        description: "Thời điểm tạo nguồn (raw.created_at)."
+      - name: source_updated_at
+        description: "Thời điểm cập nhật nguồn (raw.updated_at)."
+
+  - name: stg_postgres__products
+    description: "Chuẩn hoá thông tin sản phẩm từ `raw_product`, điền giá trị mặc định cho tiêu đề, tiền tệ và giá."
+    columns:
+      - name: product_id
+        description: "ID sản phẩm (từ `raw_product.product_id`)."
+      - name: product_title
+        description: "Tiêu đề sản phẩm; null -> 'Unknown'."
+      - name: currency
+        description: "Đơn vị tiền tệ; null -> 'Unknown'."
+      - name: price
+        description: "Giá sản phẩm; null -> -1."
+      - name: source_created_at
+        description: "Thời điểm tạo nguồn (raw.created_at)."
+      - name: source_updated_at
+        description: "Thời điểm cập nhật nguồn (raw.updated_at)."
+
+  - name: stg_postgres__categories
+    description: "Chuẩn hoá danh mục từ `raw_category`, giữ các danh mục trong danh sách hợp lệ hoặc gán 'Other'."
+    columns:
+      - name: category_id
+        description: "ID danh mục (từ `raw_category.id`)."
+      - name: category_name
+        description: "Tên danh mục đã chuẩn hoá; nếu không nằm trong whitelist -> 'Other'."
+
+  - name: stg_postgres__product_categories
+    description: "Bảng liên kết sản phẩm - danh mục lấy bản ghi mới nhất từ `raw_product_category`."
+    columns:
+      - name: product_category_id
+        description: "ID bản ghi product-category (từ `raw_product_category.id`)."
+      - name: product_id
+        description: "ID sản phẩm liên kết."
+      - name: category_id
+        description: "ID danh mục liên kết."
+
+  - name: stg_postgres__reviews
+    description: "Chuẩn hoá dữ liệu đánh giá từ `raw_review`: chuyển đổi `star_rating` thành số, fill default cho text, chuẩn hoá `verified_purchase`."
+    columns:
+      - name: review_id
+        description: "ID đánh giá (từ `raw_review.id`)."
+      - name: customer_id
+        description: "ID khách hàng viết review."
+      - name: product_id
+        description: "ID sản phẩm được review."
+      - name: star_rating
+        description: "Điểm sao chuẩn hoá (1-5); giá trị không xác định -> -1."
+      - name: helpful_votes
+        description: "Số lượt vote hữu ích; null -> 0."
+      - name: total_votes
+        description: "Tổng số lượt vote; null -> 0."
+      - name: marketplace
+        description: "Marketplace nơi review được viết; null -> 'Unknown'."
+      - name: verified_purchase
+        description: "Cờ mua hàng xác thực, chuẩn hoá các biểu diễn text thành boolean."
+      - name: review_headline
+        description: "Tiêu đề review; null -> 'Unknown'."
+      - name: review_body
+        description: "Nội dung review; null -> 'Unknown'."
+      - name: source_created_at
+        description: "Thời điểm tạo nguồn (raw.created_at)."
+      - name: source_updated_at
+        description: "Thời điểm cập nhật từ nguồn (raw.updated_at)."

@@ -17,6 +17,3 @@ dbt_airflow/target/*
 
 dbt_airflow/dbt_packages/*
 !dbt_airflow/dbt_packages/.gitkeep
-
-# Testing
-tmp/

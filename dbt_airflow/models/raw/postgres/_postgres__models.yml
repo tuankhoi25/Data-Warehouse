@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: raw_customer
+  - name: raw_postgres__customers
     columns:
       - name: id
         description: "Primary key of the customer."
@@ -26,7 +26,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_location
+  - name: raw_postgres__locations
     columns:
       - name: id
         description: "Primary key of the location."
@@ -49,7 +49,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_customer_location
+  - name: raw_postgres__customer_locations
     columns:
       - name: id
         description: "Primary key of the customer location."
@@ -66,7 +66,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_phone_number
+  - name: raw_postgres__phone_numbers
     columns:
       - name: id
         description: "Primary key of the phone number."
@@ -81,7 +81,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_customer_phone
+  - name: raw_postgres__customer_phones
     columns:
       - name: id
         description: "Primary key of the customer phone."
@@ -98,7 +98,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_product
+  - name: raw_postgres__products
     columns:
       - name: id
         description: "Primary key of the shadow product."
@@ -119,7 +119,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_category
+  - name: raw_postgres__categories
     columns:
       - name: id
         description: "Primary key of the category."
@@ -134,7 +134,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_product_category
+  - name: raw_postgres__product_categories
     columns:
       - name: id
         description: "Primary key of the product category."
@@ -151,7 +151,7 @@ models:
       - name: _batch_id
         description: "Unique identifier for each dbt run."
 
-  - name: raw_review
+  - name: raw_postgres__reviews
     columns:
       - name: id
         description: "Primary key of the review."

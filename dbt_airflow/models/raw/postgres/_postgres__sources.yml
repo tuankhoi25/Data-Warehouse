@@ -1,0 +1,277 @@
+version: 2
+
+sources:
+  - name: postgres
+    schema: postgres
+    description: >
+      Nguồn dữ liệu gốc từ hệ quản trị cơ sở dữ liệu PostgreSQL,
+      chứa các bảng nghiệp vụ liên quan đến khách hàng, sản phẩm,
+      danh mục và đánh giá.
+    tables:
+      - name: customer
+        description: >
+          Bảng lưu thông tin khách hàng cơ bản.
+        columns:
+          - name: id
+            description: Khóa chính định danh duy nhất cho mỗi khách hàng.
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: Tên đầy đủ của khách hàng.
+            tests:
+              - not_null
+          - name: sex
+            description: 'Giới tính của khách hàng (M: Male, F: Female).'
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['M', 'F', NULL]
+          - name: updated_at
+            description: Thời điểm bản ghi được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: location
+        description: >
+          Bảng lưu thông tin địa lý của khách hàng như quốc gia và mã bưu điện.
+        columns:
+          - name: id
+            description: Khóa chính định danh duy nhất cho mỗi địa điểm.
+            tests:
+              - unique
+              - not_null
+          - name: zipcode
+            description: Mã bưu điện của địa điểm.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  arguments:
+                    min_value: 1
+                    max_value: 99999
+          - name: country
+            description: Quốc gia của địa điểm.
+            tests:
+              - not_null
+          - name: updated_at
+            description: Thời điểm bản ghi địa điểm được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: customer_location
+        description: >
+          Bảng liên kết nhiều-nhiều giữa khách hàng và địa điểm.
+        columns:
+          - name: id
+            description: Khóa chính của bảng liên kết khách hàng – địa điểm.
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Khóa ngoại tham chiếu đến khách hàng.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('postgres', 'customer')
+                    field: id
+          - name: location_id
+            description: Khóa ngoại tham chiếu đến địa điểm.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('postgres', 'location')
+                    field: id
+          - name: updated_at
+            description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: phone_number
+        description: >
+          Bảng lưu thông tin số điện thoại.
+        columns:
+          - name: id
+            description: Khóa chính định danh duy nhất cho mỗi số điện thoại.
+            tests:
+              - unique
+              - not_null
+          - name: phone_number
+            description: Số điện thoại ở dạng chuỗi.
+            tests:
+              - not_null
+          - name: updated_at
+            description: Thời điểm số điện thoại được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: customer_phone
+        description: >
+          Bảng liên kết nhiều-nhiều giữa khách hàng và số điện thoại.
+        columns:
+          - name: id
+            description: Khóa chính của bảng liên kết khách hàng – số điện thoại.
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Khóa ngoại tham chiếu đến khách hàng.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('postgres', 'customer')
+                    field: id
+          - name: phone_id
+            description: Khóa ngoại tham chiếu đến số điện thoại.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('postgres', 'phone_number')
+                    field: id
+          - name: updated_at
+            description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: shadow_product
+        description: >
+          Bảng lưu thông tin sản phẩm snapshot (shadow) phục vụ theo dõi thay đổi.
+        columns:
+          - name: id
+            description: Khóa chính của bản ghi shadow product.
+            tests:
+              - unique
+              - not_null
+          - name: product_id
+            description: ID sản phẩm gốc.
+            tests:
+              - not_null
+          - name: product_title
+            description: Tên hiển thị của sản phẩm.
+            tests:
+              - not_null
+          - name: currency
+            description: Đơn vị tiền tệ của giá sản phẩm.
+            tests:
+              - not_null
+          - name: price
+            description: Giá sản phẩm tại thời điểm snapshot.
+            tests:
+              - not_null
+          - name: updated_at
+            description: Thời điểm snapshot sản phẩm được cập nhật.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: category
+        description: >
+          Bảng danh mục sản phẩm.
+        columns:
+          - name: id
+            description: Khóa chính của danh mục.
+            tests:
+              - unique
+              - not_null
+          - name: category_name
+            description: Tên danh mục sản phẩm.
+            tests:
+              - unique
+              - not_null
+          - name: updated_at
+            description: Thời điểm danh mục được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: product_category
+        description: >
+          Bảng liên kết giữa sản phẩm và danh mục.
+        columns:
+          - name: id
+            description: Khóa chính của bảng liên kết sản phẩm – danh mục.
+            tests:
+              - unique
+              - not_null
+          # - name: category_id
+          #   tests:
+          #     - not_null
+          #     - relationships:
+          #         to: source('postgres', 'category')
+          #         field: id
+          - name: updated_at
+            description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"
+
+      - name: review
+        description: >
+          Bảng lưu đánh giá sản phẩm từ khách hàng.
+        columns:
+          - name: id
+            description: Khóa chính của đánh giá.
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Khóa ngoại tham chiếu đến khách hàng đã đánh giá.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('postgres', 'customer')
+                    field: id
+          - name: star_rating
+            description: Số sao đánh giá của khách hàng (1–5).
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['1', '2', '3', '4', '5', NULL]
+          - name: helpful_votes
+            description: Số lượt bình chọn đánh giá là hữu ích.
+            tests:
+              - dbt_utils.accepted_range:
+                  arguments:
+                    min_value: 0
+          - name: total_votes
+            description: Tổng số lượt bình chọn cho đánh giá.
+            tests:
+              - dbt_utils.accepted_range:
+                  arguments:
+                    min_value: 0
+          - name: marketplace
+            description: Thị trường nơi đánh giá được ghi nhận.
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['US']
+          - name: verified_purchase
+            description: Cờ cho biết khách hàng đã mua sản phẩm hay chưa.
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['Y', 'N', NULL]
+          - name: updated_at
+            description: Thời điểm đánh giá được cập nhật lần cuối.
+            tests:
+              - dbt_utils.expression_is_true:
+                  arguments:
+                    expression: "IS NULL OR updated_at >= created_at"

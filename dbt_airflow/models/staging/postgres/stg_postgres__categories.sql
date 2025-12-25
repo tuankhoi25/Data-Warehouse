@@ -1,15 +1,11 @@
-WITH latest_ingestion_timestamp AS (
+{% set current_ingest_ts = get_current_ingestion_ts() %}
+
+WITH latest_raw_category AS (
     SELECT 
-        max(_ingested_at) AS max_ingested_at
-    FROM {{ ref('raw_category') }}
-),
-latest_raw_category AS (
-    SELECT 
-        rc.id,
-        rc.category_name
-    FROM {{ ref('raw_category') }} AS rc
-    INNER JOIN latest_ingestion_timestamp AS lit
-        ON rc._ingested_at = lit.max_ingested_at
+        id,
+        category_name
+    FROM {{ ref('raw_postgres__categories') }}
+    WHERE _ingested_at = {{ current_ingest_ts }}
 )
 
 SELECT 
