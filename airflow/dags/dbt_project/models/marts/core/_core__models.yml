@@ -1,0 +1,140 @@
+version: 2
+
+models:
+  - name: dim_dates
+    description: "Date dimension (generated). Contains a contiguous range of dates and common date attributes used for joins and reporting. Generated for 2005-01-01 through 2015-01-01."
+    columns:
+      - name: date
+        description: "Full date value."
+      - name: date_key
+        description: "Surrogate integer key in YYYYMMDD format."
+
+  - name: dim_customers
+    description: "Customer dimension (SCD1). One row per source customer with a surrogate `customer_key`."
+    columns:
+      - name: customer_key
+        description: "Surrogate key for the customer."
+      - name: customer_id
+        description: "Source customer identifier."
+      - name: sex
+        description: "Customer sex/gender from source."
+      - name: customer_name
+        description: "Customer full name."
+      - name: mail
+        description: "Customer email address."
+      - name: birth_date
+        description: "Customer birth date."
+      - name: signup_date
+        description: "Date the customer signed up."
+
+  - name: dim_products
+    description: "Product dimension (SCD2). Tracks product attributes over time with `valid_from`, `valid_to` and `is_current`."
+    columns:
+      - name: product_key
+        description: "Surrogate key for the product (SCD)."
+      - name: product_id
+        description: "Source product identifier."
+      - name: product_title
+        description: "Product title/name."
+      - name: currency
+        description: "Currency code for the product price."
+      - name: price
+        description: "Product price."
+      - name: valid_from
+        description: "Start of this row's validity period."
+      - name: valid_to
+        description: "End of this row's validity period (NULL for current)."
+      - name: is_current
+        description: "Boolean flag indicating the current active row."
+
+  - name: dim_categories
+    description: "Category dimension (SCD1). Contains category metadata and a surrogate `category_key`."
+    columns:
+      - name: category_key
+        description: "Surrogate key for the category."
+      - name: category_id
+        description: "Source category identifier."
+      - name: category_name
+        description: "Human-readable category name."
+
+  - name: dim_locations
+    description: "Location dimension (SCD1). Stores address fields and a surrogate `location_key`."
+    columns:
+      - name: location_key
+        description: "Surrogate key for the location."
+      - name: location_id
+        description: "Source location identifier."
+      - name: street_address
+        description: "Street address."
+      - name: city
+        description: "City name."
+      - name: state
+        description: "State or region."
+      - name: zipcode
+        description: "Postal code."
+      - name: country
+        description: "Country name or code."
+
+  - name: bridge_products_categories
+    description: "Bridge table linking products to categories (SCD1 style). Contains product and category surrogate keys."
+    columns:
+      - name: product_category_key
+        description: "Surrogate key for the product-category relationship."
+      - name: product_category_id
+        description: "Source id for the product-category relationship (if present)."
+      - name: product_key
+        description: "Surrogate key referencing `dim_products`."
+      - name: category_key
+        description: "Surrogate key referencing `dim_categories`."
+
+  - name: bridge_customers_locations
+    description: "Bridge table linking customers to locations (SCD2 pattern implemented with delete+insert incremental). Tracks history via `valid_from`, `valid_to` and `is_current`."
+    columns:
+      - name: customer_location_key
+        description: "Surrogate key for the customer-location relationship (SCD)."
+      - name: customer_location_id
+        description: "Source id for the customer-location relationship."
+      - name: customer_key
+        description: "Surrogate key referencing `dim_customers`."
+      - name: location_key
+        description: "Surrogate key referencing `dim_locations`."
+      - name: valid_from
+        description: "Start of this relationship's validity."
+      - name: valid_to
+        description: "End of this relationship's validity (NULL when current)."
+      - name: is_current
+        description: "Boolean flag indicating the current active relationship row."
+
+  - name: fact_reviews
+    description: "Fact table of product reviews (SCD2 pattern for row-level history). Contains review metrics and references to customer and product dimensions."
+    columns:
+      - name: review_key
+        description: "Surrogate key for the review (SCD)."
+      - name: review_id
+        description: "Source review identifier."
+      - name: customer_key
+        description: "Surrogate key referencing `dim_customers`."
+      - name: product_key
+        description: "Surrogate key referencing `dim_products`."
+      - name: star_rating
+        description: "Review star rating."
+      - name: helpful_votes
+        description: "Number of helpful votes."
+      - name: total_votes
+        description: "Total votes for the review."
+      - name: marketplace
+        description: "Marketplace identifier (source)."
+      - name: verified_purchase
+        description: "Boolean flag for verified purchases."
+      - name: review_headline
+        description: "Short headline for the review."
+      - name: review_body
+        description: "Full review text/body."
+      - name: valid_from
+        description: "Start timestamp when this review row became valid."
+      - name: valid_from_date_key
+        description: "Date key (YYYYMMDD) for `valid_from`."
+      - name: valid_to
+        description: "End timestamp for the row's validity (NULL when current)."
+      - name: is_current
+        description: "Boolean flag indicating the current active row for the review."
