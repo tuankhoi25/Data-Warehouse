@@ -1,4 +1,4 @@
-name: dbt_airflow
+name: dbt_project
 
 config-version: 2
 
@@ -9,7 +9,7 @@ test-paths: ["tests"]
 macro-paths: ["macros"]
 
 models:
-  dbt_airflow:
+  dbt_project:
     +materialized: table
     raw:
       +materialized: incremental

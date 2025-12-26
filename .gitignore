@@ -9,11 +9,14 @@ data_source/postgres/*
 .venv/
 
 # Operation Logs
-dbt_airflow/logs/*
-!dbt_airflow/logs/.gitkeep
+airflow/dags/dbt_project/logs/*
+!dbt_project/logs/.gitkeep
 
-dbt_airflow/target/*
-!dbt_airflow/target/.gitkeep
+airflow/dags/dbt_project/target/*
+!dbt_project/target/.gitkeep
 
-dbt_airflow/dbt_packages/*
-!dbt_airflow/dbt_packages/.gitkeep
+airflow/dags/dbt_project/dbt_packages/*
+!dbt_project/dbt_packages/.gitkeep
+
+airflow/logs/*
+!airflow/logs/.gitkeep
