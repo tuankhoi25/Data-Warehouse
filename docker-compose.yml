@@ -1,32 +1,32 @@
-x-airflow-common:
-  &airflow-common
-  build:
-    context: .
-    dockerfile: docker/Dockerfile.airflow
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.1.3}
-  env_file:
-    - .env
-  environment:
-    &airflow-common-env
-    AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@postgres-backend-db:5432/${AIRFLOW_POSTGRES_DB}
-    AIRFLOW__CORE__FERNET_KEY: ''
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
-    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
-    AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
-  volumes:
-    - ./airflow/dags:/opt/airflow/dags
-    - ./airflow/logs:/opt/airflow/logs
-    - ./airflow/config:/opt/airflow/config
-    - ./airflow/plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}:0"
-  depends_on:
-    &airflow-common-depends-on
-    postgres-backend-db:
-      condition: service_healthy
+# x-airflow-common:
+#   &airflow-common
+#   build:
+#     context: .
+#     dockerfile: docker/Dockerfile.airflow
+#   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.1.3}
+#   env_file:
+#     - .env
+#   environment:
+#     &airflow-common-env
+#     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+#     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+#     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_POSTGRES_USER}:${AIRFLOW_POSTGRES_PASSWORD}@postgres-backend-db:5432/${AIRFLOW_POSTGRES_DB}
+#     AIRFLOW__CORE__FERNET_KEY: ''
+#     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+#     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+#     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
+#     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+#     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+#   volumes:
+#     - ./airflow/dags:/opt/airflow/dags
+#     - ./airflow/logs:/opt/airflow/logs
+#     - ./airflow/config:/opt/airflow/config
+#     - ./airflow/plugins:/opt/airflow/plugins
+#   user: "${AIRFLOW_UID:-50000}:0"
+#   depends_on:
+#     &airflow-common-depends-on
+#     postgres-backend-db:
+#       condition: service_healthy
 
 services:
   postgres:
@@ -144,99 +144,99 @@ services:
     ports:
       - 9183:9181
 
-  postgres-backend-db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: ${POSTGRES_BE_DB_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_BE_DB_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_BE_DB_DB}
-    volumes:
-      - postgres_backend_db-volume:/var/lib/postgresql/data
-      - ./data_platform_config/postgres_backend_db/integration/01_create_databases.sql:/docker-entrypoint-initdb.d/01_create_databases.sql:ro
-    ports:
-      - ${POSTGRES_BE_DB_PORT}:5432
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_BE_DB_USER}"]
-      interval: 10s
-      retries: 5
-      start_period: 5s
-    restart: always
+#   postgres-backend-db:
+#     image: postgres:16
+#     environment:
+#       POSTGRES_USER: ${POSTGRES_BE_DB_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_BE_DB_PASSWORD}
+#       POSTGRES_DB: ${POSTGRES_BE_DB_DB}
+#     volumes:
+#       - postgres_backend_db-volume:/var/lib/postgresql/data
+#       - ./data_platform_config/postgres_backend_db/integration/01_create_databases.sql:/docker-entrypoint-initdb.d/01_create_databases.sql:ro
+#     ports:
+#       - ${POSTGRES_BE_DB_PORT}:5432
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "${POSTGRES_BE_DB_USER}"]
+#       interval: 10s
+#       retries: 5
+#       start_period: 5s
+#     restart: always
 
-  airflow-apiserver:
-    <<: *airflow-common
-    command: api-server
-    ports:
-      - 8080:8080
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+#   airflow-apiserver:
+#     <<: *airflow-common
+#     command: api-server
+#     ports:
+#       - 8080:8080
+#     healthcheck:
+#       test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 5
+#       start_period: 30s
+#     restart: always
+#     depends_on:
+#       <<: *airflow-common-depends-on
+#       airflow-init:
+#         condition: service_completed_successfully
 
-  airflow-scheduler:
-    <<: *airflow-common
-    command: scheduler
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+#   airflow-scheduler:
+#     <<: *airflow-common
+#     command: scheduler
+#     healthcheck:
+#       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 5
+#       start_period: 30s
+#     restart: always
+#     depends_on:
+#       <<: *airflow-common-depends-on
+#       airflow-init:
+#         condition: service_completed_successfully
 
-  airflow-dag-processor:
-    <<: *airflow-common
-    command: dag-processor
-    healthcheck:
-      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+#   airflow-dag-processor:
+#     <<: *airflow-common
+#     command: dag-processor
+#     healthcheck:
+#       test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+#       interval: 30s
+#       timeout: 10s
+#       retries: 5
+#       start_period: 30s
+#     restart: always
+#     depends_on:
+#       <<: *airflow-common-depends-on
+#       airflow-init:
+#         condition: service_completed_successfully
 
-  airflow-init:
-    <<: *airflow-common
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        # Set AIRFLOW_UID nếu chưa có
-        if [[ -z "${AIRFLOW_UID}" ]]; then
-          export AIRFLOW_UID=$$(id -u)
-        fi
+#   airflow-init:
+#     <<: *airflow-common
+#     entrypoint: /bin/bash
+#     command:
+#       - -c
+#       - |
+#         # Set AIRFLOW_UID nếu chưa có
+#         if [[ -z "${AIRFLOW_UID}" ]]; then
+#           export AIRFLOW_UID=$$(id -u)
+#         fi
 
-        # Tạo thư mục cần thiết
-        mkdir -p /opt/airflow/{logs,dags,plugins,config}
+#         # Tạo thư mục cần thiết
+#         mkdir -p /opt/airflow/{logs,dags,plugins,config}
 
-        # Khởi tạo config nếu chưa có
-        /entrypoint airflow config list >/dev/null
+#         # Khởi tạo config nếu chưa có
+#         /entrypoint airflow config list >/dev/null
 
-        # Set quyền sở hữu thư mục
-        chown -R "${AIRFLOW_UID}:0" /opt/airflow/
-        chown -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
-    environment:
-      <<: *airflow-common-env
-      _AIRFLOW_DB_MIGRATE: 'true'
-      _AIRFLOW_WWW_USER_CREATE: 'true'
-      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
-      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-      _PIP_ADDITIONAL_REQUIREMENTS: ''
-    user: "0:0"
+#         # Set quyền sở hữu thư mục
+#         chown -R "${AIRFLOW_UID}:0" /opt/airflow/
+#         chown -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
+#     environment:
+#       <<: *airflow-common-env
+#       _AIRFLOW_DB_MIGRATE: 'true'
+#       _AIRFLOW_WWW_USER_CREATE: 'true'
+#       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+#       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+#       _PIP_ADDITIONAL_REQUIREMENTS: ''
+#     user: "0:0"
 
-volumes:
-  postgres_backend_db-volume:
+# volumes:
+#   postgres_backend_db-volume:

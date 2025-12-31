@@ -11,13 +11,13 @@ macro-paths: ["macros"]
 models:
   dbt_project:
     +materialized: table
-    raw:
-      +materialized: incremental
-      +incremental_strategy: append
-      +schema: raw
+    utils:
+      +materialized: table
+      +schema: utils
     staging:
-      +materialized: view
+      +materialized: table
       +schema: staging
+      +engine: MergeTree
     # intermediate:
     #   +materialized: table
     #   +schema: intermediate

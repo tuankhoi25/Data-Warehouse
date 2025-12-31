@@ -2,9 +2,11 @@
 
 {{
   config(
-    materialized='incremental',
-    unique_key='product_category_key',
-    incremental_strategy='delete+insert',
+    order_by="(product_category_key)",
+    primary_key="(product_category_key)",
+    materialized="incremental",
+    unique_key="product_category_key",
+    incremental_strategy="delete+insert",
   )
 }}
 
@@ -30,7 +32,7 @@ SELECT
     dp.product_key,
     dc.category_key
 FROM delta_rows AS dr
-JOIN dim_products AS dp
-    ON dp.product_id = dr.product_id
 JOIN dim_categories AS dc
     ON dc.category_id = dr.category_id
+JOIN dim_products AS dp
+    ON dp.product_id = dr.product_id

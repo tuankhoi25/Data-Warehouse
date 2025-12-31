@@ -1,11 +1,13 @@
 -- SCD2: using delete+insert with is_incremental()
 
 {{
-  config(
-    materialized='incremental',
-    unique_key='customer_location_key',
-    incremental_strategy='delete+insert',
-  )
+    config(
+        order_by="(is_current, valid_from, customer_location_id, customer_location_key)",
+        primary_key="(is_current, valid_from, customer_location_id, customer_location_key)",
+        materialized="incremental",
+        unique_key="customer_location_key",
+        incremental_strategy="delete+insert",
+    )
 }}
 
 WITH delta_rows AS (

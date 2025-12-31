@@ -2,9 +2,11 @@
 
 {{
   config(
-    materialized='incremental',
-    unique_key='customer_key',
-    incremental_strategy='delete+insert',
+    order_by="(customer_key)",
+    primary_key="(customer_key)",
+    materialized="incremental",
+    unique_key="customer_key",
+    incremental_strategy="delete+insert",
   )
 }}
 

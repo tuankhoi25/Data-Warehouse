@@ -2,9 +2,11 @@
 
 {{
   config(
-    materialized='incremental',
-    unique_key='review_key',
-    incremental_strategy='delete+insert',
+    order_by="(is_current, valid_from, review_id, review_key)",
+    primary_key="(is_current, valid_from, review_id, review_key)",
+    materialized="incremental",
+    unique_key="review_key",
+    incremental_strategy="delete+insert",
   )
 }}
 
@@ -50,6 +52,7 @@ dim_customers AS (
 ),
 dim_products AS (
     SELECT * FROM {{ ref('dim_products') }}
+    WHERE is_current = TRUE
 ),
 inserted_rows AS (
     SELECT

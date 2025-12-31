@@ -2,109 +2,152 @@ version: 2
 
 models:
   - name: stg_postgres__customers
-    description: "Lớp staging chuẩn hoá dữ liệu khách hàng từ `raw_customer`. Chuyển đổi giá trị null và map giá trị `sex` thành mã số."
+    description: "Staging chuẩn hoá dữ liệu khách hàng: map null và cast kiểu."
     columns:
       - name: customer_id
-        description: "ID khách hàng (từ `raw_customer.id`)."
+        data_type: UInt64
+        description: "Khóa chính khách hàng (từ source `customer.id`)."
       - name: customer_name
+        data_type: String
         description: "Tên khách hàng; null được thay bằng 'Unknown'."
       - name: sex
-        description: "Giới tính mã hoá thành số (1=male,2=female,3=other)."
+        data_type: Int8
+        description: "Giới tính mã hoá (1=male,2=female,3=other)."
       - name: mail
+        data_type: String
         description: "Email khách hàng; null được thay bằng giá trị mặc định."
       - name: birth_date
-        description: "Ngày sinh; null được thay bằng '1900-01-01'."
+        data_type: Date
+        description: "Ngày sinh khách hàng; null được thay bằng giá trị mặc định."
       - name: signup_date
-        description: "Thời điểm tạo tài khoản (từ `raw_customer.created_at`)."
+        data_type: Date
+        description: "Thời điểm tạo tài khoản (từ source `created_at`)."
 
   - name: stg_postgres__locations
-    description: "Lớp staging chuẩn hoá thông tin địa điểm từ `raw_location`. Điền giá trị mặc định cho các trường thiếu."
+    description: "Staging chuẩn hoá thông tin địa điểm từ source `location`."
     columns:
       - name: location_id
-        description: "ID địa điểm (từ `raw_location.id`)."
+        data_type: UUID
+        description: "Khóa chính địa điểm (từ source `location.id`)."
       - name: street_address
-        description: "Địa chỉ; null -> 'Unknown'."
+        data_type: String
+        description: "Địa chỉ đường; null -> 'Unknown'."
       - name: city
+        data_type: LowCardinality(String)
         description: "Thành phố; null -> 'Unknown'."
       - name: state
-        description: "Tỉnh/tiểu bang; null -> 'Unknown'."
+        data_type: LowCardinality(String)
+        description: "Tiểu bang / tỉnh; null -> 'Unknown'."
       - name: zipcode
-        description: "Mã bưu chính, được pad/truncate về định dạng chuỗi 6 ký tự."
+        data_type: FixedString(6)
+        description: "Mã bưu điện, pad về chuỗi 6 ký tự."
       - name: country
+        data_type: String
         description: "Quốc gia; null -> 'Unknown'."
+      - name: source_updated_at
+        data_type: String
+        description: "Trường `updated_at` nguồn đã được cast về String trong staging."
 
   - name: stg_postgres__customer_locations
-    description: "Liên kết khách hàng - địa điểm lấy bản ghi mới nhất từ `raw_customer_location`."
+    description: "Staging liên kết khách hàng - địa điểm từ source `customer_location`."
     columns:
       - name: customer_location_id
-        description: "ID bản ghi customer-location (từ `raw_customer_location.id`)."
+        data_type: UInt64
+        description: "Khóa chính bảng liên kết (từ source `id`)."
       - name: customer_id
-        description: "ID khách hàng liên kết."
+        data_type: Int64
+        description: "Khóa ngoại tham chiếu khách hàng."
       - name: location_id
-        description: "ID địa điểm liên kết."
+        data_type: UUID
+        description: "Khóa ngoại tham chiếu địa điểm."
       - name: source_created_at
-        description: "Thời điểm tạo nguồn (raw.created_at)."
+        data_type: Date
+        description: "Thời điểm tạo bản ghi nguồn."
       - name: source_updated_at
-        description: "Thời điểm cập nhật nguồn (raw.updated_at)."
+        data_type: Date
+        description: "Thời điểm cập nhật bản ghi nguồn (đã cast sang Date)."
 
   - name: stg_postgres__products
-    description: "Chuẩn hoá thông tin sản phẩm từ `raw_product`, điền giá trị mặc định cho tiêu đề, tiền tệ và giá."
+    description: "Staging dữ liệu sản phẩm từ `shadow_product` (snapshot)."
     columns:
       - name: product_id
-        description: "ID sản phẩm (từ `raw_product.product_id`)."
+        data_type: String
+        description: "ID sản phẩm (từ `shadow_product.product_id`)."
       - name: product_title
-        description: "Tiêu đề sản phẩm; null -> 'Unknown'."
+        data_type: String
+        description: "Tiêu đề hiển thị sản phẩm."
       - name: currency
-        description: "Đơn vị tiền tệ; null -> 'Unknown'."
+        data_type: String
+        description: "Đơn vị tiền tệ của giá sản phẩm."
       - name: price
-        description: "Giá sản phẩm; null -> -1."
+        data_type: Decimal(10, 2)
+        description: "Giá sản phẩm tại thời điểm snapshot."
       - name: source_created_at
-        description: "Thời điểm tạo nguồn (raw.created_at)."
+        data_type: Date
+        description: "Thời điểm tạo bản ghi nguồn."
       - name: source_updated_at
-        description: "Thời điểm cập nhật nguồn (raw.updated_at)."
+        data_type: Date
+        description: "Thời điểm cập nhật bản ghi nguồn (đã cast sang Date)."
 
   - name: stg_postgres__categories
-    description: "Chuẩn hoá danh mục từ `raw_category`, giữ các danh mục trong danh sách hợp lệ hoặc gán 'Other'."
+    description: "Staging danh mục; chuẩn hoá tên theo danh sách whitelist."
     columns:
       - name: category_id
-        description: "ID danh mục (từ `raw_category.id`)."
+        data_type: UInt64
+        description: "Khóa chính danh mục (từ source `id`)."
       - name: category_name
-        description: "Tên danh mục đã chuẩn hoá; nếu không nằm trong whitelist -> 'Other'."
+        data_type: String
+        description: "Tên danh mục đã chuẩn hoá; không hợp lệ -> 'Other'."
 
   - name: stg_postgres__product_categories
-    description: "Bảng liên kết sản phẩm - danh mục lấy bản ghi mới nhất từ `raw_product_category`."
+    description: "Staging liên kết sản phẩm - danh mục từ source `product_category`."
     columns:
       - name: product_category_id
-        description: "ID bản ghi product-category (từ `raw_product_category.id`)."
+        data_type: UInt64
+        description: "Khóa chính bảng liên kết (từ source `id`)."
       - name: product_id
+        data_type: String
         description: "ID sản phẩm liên kết."
       - name: category_id
+        data_type: Int64
         description: "ID danh mục liên kết."
 
   - name: stg_postgres__reviews
-    description: "Chuẩn hoá dữ liệu đánh giá từ `raw_review`: chuyển đổi `star_rating` thành số, fill default cho text, chuẩn hoá `verified_purchase`."
+    description: "Staging dữ liệu đánh giá: cast kiểu, fill default và chuẩn hoá cờ verified."
     columns:
       - name: review_id
-        description: "ID đánh giá (từ `raw_review.id`)."
+        data_type: String
+        description: "Khóa chính đánh giá (từ source `id`)."
       - name: customer_id
-        description: "ID khách hàng viết review."
+        data_type: Int64
+        description: "Khóa ngoại khách hàng đã đánh giá."
       - name: product_id
-        description: "ID sản phẩm được review."
+        data_type: String
+        description: "Khóa tham chiếu sản phẩm."
       - name: star_rating
-        description: "Điểm sao chuẩn hoá (1-5); giá trị không xác định -> -1."
+        data_type: Int8
+        description: "Điểm sao (1-5)."
       - name: helpful_votes
-        description: "Số lượt vote hữu ích; null -> 0."
+        data_type: Int32
+        description: "Số lượt được đánh dấu hữu ích; null -> 0."
       - name: total_votes
-        description: "Tổng số lượt vote; null -> 0."
+        data_type: Int32
+        description: "Tổng số lượt bình chọn; null -> 0."
       - name: marketplace
-        description: "Marketplace nơi review được viết; null -> 'Unknown'."
+        data_type: LowCardinality(FixedString(2))
+        description: "Mã marketplace (ví dụ 'US'); null -> 'Un'."
       - name: verified_purchase
-        description: "Cờ mua hàng xác thực, chuẩn hoá các biểu diễn text thành boolean."
+        data_type: Bool
+        description: "Cờ đã mua thực sự (cast từ nhiều biểu diễn text)."
       - name: review_headline
+        data_type: String
         description: "Tiêu đề review; null -> 'Unknown'."
       - name: review_body
+        data_type: String
         description: "Nội dung review; null -> 'Unknown'."
       - name: source_created_at
-        description: "Thời điểm tạo nguồn (raw.created_at)."
+        data_type: Date
+        description: "Thời điểm tạo bản ghi nguồn."
       - name: source_updated_at
-        description: "Thời điểm cập nhật từ nguồn (raw.updated_at)."
+        data_type: Date
+        description: "Thời điểm cập nhật bản ghi nguồn (đã cast sang Date)."
