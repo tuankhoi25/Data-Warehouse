@@ -50,7 +50,7 @@ type_casting AS (
         cast(city, 'LowCardinality(String)') AS city,
         cast(state, 'LowCardinality(String)') AS state,
         cast(leftPad(toString(zipcode), 6, '0'), 'FixedString(6)') AS zipcode,
-        cast(updated_at, 'String') AS updated_at
+        cast(updated_at, 'Date') AS updated_at
     )
     FROM handle_null
 )

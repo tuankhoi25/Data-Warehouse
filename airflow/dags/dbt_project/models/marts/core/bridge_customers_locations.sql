@@ -30,7 +30,7 @@ expired_rows AS (
         er.customer_key,
         er.location_key,
         er.valid_from,
-        dr.source_updated_at AS valid_to,
+        toNullable(dr.source_updated_at) AS valid_to,
         FALSE AS is_current
     FROM active_rows AS er
     INNER JOIN delta_rows AS dr
@@ -52,8 +52,11 @@ inserted_rows AS (
         dc.customer_key,
         dl.location_key,
         source_updated_at AS valid_from,
-        CAST(NULL AS Nullable(DateTime)) AS valid_to,
-        TRUE AS is_current
+        (lead(toNullable(source_updated_at), 1) OVER (PARTITION BY customer_location_id ORDER BY source_updated_at ASC)) AS valid_to,
+        CASE
+            WHEN valid_to IS NULL THEN TRUE
+            ELSE FALSE
+        END AS is_current
     FROM delta_rows AS dr
     JOIN dim_customers AS dc
         ON dc.customer_id = dr.customer_id

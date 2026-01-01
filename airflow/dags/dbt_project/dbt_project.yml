@@ -17,7 +17,6 @@ models:
     staging:
       +materialized: table
       +schema: staging
-      +engine: MergeTree
     # intermediate:
     #   +materialized: table
     #   +schema: intermediate

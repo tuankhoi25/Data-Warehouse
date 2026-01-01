@@ -45,8 +45,8 @@ models:
         data_type: String
         description: "Quốc gia; null -> 'Unknown'."
       - name: source_updated_at
-        data_type: String
-        description: "Trường `updated_at` nguồn đã được cast về String trong staging."
+        data_type: Date
+        description: "Trường `updated_at` nguồn đã được cast về Date trong staging."
 
   - name: stg_postgres__customer_locations
     description: "Staging liên kết khách hàng - địa điểm từ source `customer_location`."

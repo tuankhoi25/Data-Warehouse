@@ -38,7 +38,7 @@ expired_rows AS (
         er.review_body,
         er.valid_from,
         er.valid_from_date_key,
-        dr.source_updated_at AS valid_to,
+        toNullable(dr.source_updated_at) AS valid_to,
         FALSE AS is_current
     FROM active_rows AS er
     INNER JOIN delta_rows AS dr
@@ -48,29 +48,38 @@ expired_rows AS (
 {% endif %}
 
 dim_customers AS (
-    SELECT * FROM {{ ref('dim_customers') }}
+    SELECT 
+        customer_key,
+        customer_id
+    FROM {{ ref('dim_customers') }}
 ),
 dim_products AS (
-    SELECT * FROM {{ ref('dim_products') }}
+    SELECT 
+        product_key,
+        product_id
+    FROM {{ ref('dim_products') }}
     WHERE is_current = TRUE
 ),
 inserted_rows AS (
     SELECT
-        {{ dbt_utils.generate_surrogate_key(['review_id', 'source_updated_at']) }} AS review_key,
-        review_id,
-        customer_key,
-        product_key,
-        star_rating,
-        helpful_votes,
-        total_votes,
-        marketplace,
-        verified_purchase,
-        review_headline,
-        review_body,
-        source_updated_at AS valid_from,
-        toInt64(formatDateTime(source_updated_at, '%Y%m%d')) AS valid_from_date_key,
-        CAST(NULL AS Nullable(DateTime)) AS valid_to,
-        TRUE AS is_current
+        {{ dbt_utils.generate_surrogate_key(['dr.review_id', 'dr.source_updated_at']) }} AS review_key,
+        dr.review_id,
+        dc.customer_key,
+        dp.product_key,
+        dr.star_rating,
+        dr.helpful_votes,
+        dr.total_votes,
+        dr.marketplace,
+        dr.verified_purchase,
+        dr.review_headline,
+        dr.review_body,
+        dr.source_updated_at AS valid_from,
+        toInt64(formatDateTime(dr.source_updated_at, '%Y%m%d')) AS valid_from_date_key,
+        (lead(toNullable(dr.source_updated_at), 1) OVER (PARTITION BY dr.review_id ORDER BY dr.source_updated_at ASC)) AS valid_to,
+        CASE
+            WHEN valid_to IS NULL THEN TRUE
+            ELSE FALSE
+        END AS is_current
     FROM delta_rows AS dr
     JOIN dim_customers AS dc
         ON dc.customer_id = dr.customer_id
@@ -83,5 +92,7 @@ SELECT
 FROM inserted_rows
 {% if is_incremental() %}
 UNION ALL
-SELECT * FROM expired_rows
+SELECT 
+    *
+FROM expired_rows
 {% endif %}

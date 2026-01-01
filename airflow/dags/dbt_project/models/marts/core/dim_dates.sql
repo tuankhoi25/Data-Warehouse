@@ -10,7 +10,6 @@
 {% set end_date = '2015-01-01' %}
 
 WITH dates AS (
-
     SELECT
         addDays(toDate('{{ start_date }}'), number) AS full_date
     FROM numbers(
@@ -20,7 +19,6 @@ WITH dates AS (
             toDate('{{ end_date }}')
         ) + 1
     )
-
 )
 
 SELECT

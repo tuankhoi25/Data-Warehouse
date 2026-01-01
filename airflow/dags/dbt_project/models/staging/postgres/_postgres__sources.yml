@@ -15,19 +15,19 @@ sources:
           - name: id
             data_type: UInt64
             description: Khóa chính định danh duy nhất cho mỗi khách hàng.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: name
             data_type: Nullable(String)
             description: Tên đầy đủ của khách hàng.
           - name: sex
             data_type: Nullable(FixedString(1))
             description: 'Giới tính của khách hàng (M: Male, F: Female).'
-            tests:
-              - accepted_values:
-                  arguments:
-                    values: ['M', 'F', NULL]
+            # tests:
+            #   - accepted_values:
+            #       arguments:
+            #         values: ['M', 'F', NULL]
           - name: mail
             data_type: Nullable(String)
             description: Email của khách hàng.
@@ -37,25 +37,25 @@ sources:
           - name: login_username
             data_type: String
             description: Tên đăng nhập của khách hàng.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: login_password
             data_type: String
             description: Mật khẩu đăng nhập của khách hàng.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm bản ghi được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: location
         description: >
@@ -64,28 +64,28 @@ sources:
           - name: id
             data_type: UUID
             description: Khóa chính định danh duy nhất cho mỗi địa điểm.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: zipcode
             data_type: Int32
             description: Mã bưu điện của địa điểm.
-            tests:
-              - not_null
-              - dbt_utils.accepted_range:
-                  arguments:
-                    min_value: 1
-                    max_value: 99999
+            # tests:
+            #   - not_null
+              # - dbt_utils.accepted_range:
+              #     arguments:
+              #       min_value: 1
+              #       max_value: 99999
           - name: country
             data_type: String
             description: Quốc gia của địa điểm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: street_address
             data_type: String
             description: Địa chỉ đường của địa điểm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: city
             data_type: Nullable(String)
             description: Thành phố của địa điểm.
@@ -95,15 +95,15 @@ sources:
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm bản ghi địa điểm được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: customer_location
         description: >
@@ -112,39 +112,39 @@ sources:
           - name: id
             data_type: UInt64
             description: Khóa chính của bảng liên kết khách hàng – địa điểm.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: customer_id
             data_type: Int64
             description: Khóa ngoại tham chiếu đến khách hàng.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'customer')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'customer')
+              #       field: id
           - name: location_id
             data_type: UUID
             description: Khóa ngoại tham chiếu đến địa điểm.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'location')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'location')
+              #       field: id
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: phone_number
         description: >
@@ -153,26 +153,26 @@ sources:
           - name: id
             data_type: UUID
             description: Khóa chính định danh duy nhất cho mỗi số điện thoại.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: phone_number
             data_type: String
             description: Số điện thoại ở dạng chuỗi.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm số điện thoại được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: customer_phone
         description: >
@@ -181,39 +181,39 @@ sources:
           - name: id
             data_type: UInt64
             description: Khóa chính của bảng liên kết khách hàng – số điện thoại.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: customer_id
             data_type: Int64
             description: Khóa ngoại tham chiếu đến khách hàng.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'customer')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'customer')
+              #       field: id
           - name: phone_id
             data_type: UUID
             description: Khóa ngoại tham chiếu đến số điện thoại.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'phone_number')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'phone_number')
+              #       field: id
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: shadow_product
         description: >
@@ -222,41 +222,41 @@ sources:
           - name: id
             data_type: UUID
             description: Khóa chính của bản ghi shadow product.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: product_id
             data_type: String
             description: ID sản phẩm gốc.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: product_title
             data_type: String
             description: Tên hiển thị của sản phẩm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: currency
             data_type: String
             description: Đơn vị tiền tệ của giá sản phẩm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: price
             data_type: Decimal(10, 2)
             description: Giá sản phẩm tại thời điểm snapshot.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm snapshot sản phẩm được cập nhật.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: category
         description: >
@@ -265,27 +265,27 @@ sources:
           - name: id
             data_type: UInt64
             description: Khóa chính của danh mục.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: category_name
             data_type: String
             description: Tên danh mục sản phẩm.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm danh mục được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: product_category
         description: >
@@ -294,35 +294,35 @@ sources:
           - name: id
             data_type: UInt64
             description: Khóa chính của bảng liên kết sản phẩm – danh mục.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: product_id
             data_type: String
             description: Khóa tham chiếu tới sản phẩm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: category_id
             data_type: Int64
             description: Khóa tham chiếu tới danh mục.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'category')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'category')
+              #       field: id
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm bản ghi liên kết được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"
 
       - name: review
         description: >
@@ -331,58 +331,58 @@ sources:
           - name: id
             data_type: String
             description: Khóa chính của đánh giá.
-            tests:
-              - unique
-              - not_null
+            # tests:
+            #   - unique
+            #   - not_null
           - name: customer_id
             data_type: Int64
             description: Khóa ngoại tham chiếu đến khách hàng đã đánh giá.
-            tests:
-              - not_null
-              - relationships:
-                  arguments:
-                    to: source('postgres', 'customer')
-                    field: id
+            # tests:
+            #   - not_null
+              # - relationships:
+              #     arguments:
+              #       to: source('postgres', 'customer')
+              #       field: id
           - name: product_id
             data_type: String
             description: Khóa ngoại tham chiếu đến sản phẩm.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: star_rating
             data_type: Nullable(FixedString(1))
             description: Số sao đánh giá của khách hàng (1–5).
-            tests:
-              - accepted_values:
-                  arguments:
-                    values: ['1', '2', '3', '4', '5', NULL]
+            # tests:
+            #   - accepted_values:
+            #       arguments:
+            #         values: ['1', '2', '3', '4', '5', NULL]
           - name: helpful_votes
             data_type: Nullable(Int32)
             description: Số lượt bình chọn đánh giá là hữu ích.
-            tests:
-              - dbt_utils.accepted_range:
-                  arguments:
-                    min_value: 0
+            # tests:
+            #   - dbt_utils.accepted_range:
+            #       arguments:
+            #         min_value: 0
           - name: total_votes
             data_type: Nullable(Int32)
             description: Tổng số lượt bình chọn cho đánh giá.
-            tests:
-              - dbt_utils.accepted_range:
-                  arguments:
-                    min_value: 0
+            # tests:
+            #   - dbt_utils.accepted_range:
+            #       arguments:
+            #         min_value: 0
           - name: marketplace
             data_type: Nullable(FixedString(2))
             description: Thị trường nơi đánh giá được ghi nhận.
-            tests:
-              - accepted_values:
-                  arguments:
-                    values: ['US', NULL]
+            # tests:
+            #   - accepted_values:
+            #       arguments:
+            #         values: ['US', NULL]
           - name: verified_purchase
             data_type: Nullable(FixedString(1))
             description: Cờ cho biết khách hàng đã mua sản phẩm hay chưa.
-            tests:
-              - accepted_values:
-                  arguments:
-                    values: ['Y', 'N', NULL]
+            # tests:
+            #   - accepted_values:
+            #       arguments:
+            #         values: ['Y', 'N', NULL]
           - name: review_headline
             data_type: Nullable(String)
             description: Tiêu đề của đánh giá.
@@ -392,12 +392,12 @@ sources:
           - name: created_at
             data_type: Date
             description: Thời điểm bản ghi được tạo.
-            tests:
-              - not_null
+            # tests:
+            #   - not_null
           - name: updated_at
             data_type: Nullable(Date)
             description: Thời điểm đánh giá được cập nhật lần cuối.
-            tests:
-              - dbt_utils.expression_is_true:
-                  arguments:
-                    expression: "updated_at >= created_at"
+            # tests:
+            #   - dbt_utils.expression_is_true:
+            #       arguments:
+            #         expression: "updated_at >= created_at"

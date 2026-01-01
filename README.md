@@ -7,9 +7,11 @@
     - 1.3. [DBT (Data Build Tool)](#13-dbt-data-build-tool)
     - 1.4. [ClickHouse](#14-clickhouse)
     - 1.5. [OpenMetadata](#15-openmetadata)
+    - 1.6. [dbt-colibri](#16-dbt-colibri)
 2. [Áp dụng với bộ dữ liệu mẫu](#2-áp-dụng-với-bộ-dữ-liệu-mẫu)
     - 2.1. [Bộ dữ liệu](#21-bộ-dữ-liệu-tái-sử-dụng-từ-repo-lakehouse-cũ)
     - 2.2. [Project Structure](#22-project-structure)
+    - 2.3. [Data Catalog Integration](#23-data-catalog-integration)
 
 ---
 
@@ -89,9 +91,31 @@ Hiện chỉ đang triển khai vội để viết pipeline (chưa tìm hiểu k
 
 ### 1.5. OpenMetadata
 
-Dự định dùng OpenMetadata làm Data Catalog để xem Data Lineag
+Data Catalog giúp doanh nghiệp tiếp cận tri thức dễ hơn, trưc quan hơn và có sự thống nhất hơn:
 
-dbt-colibri là dự án open source giúp hiển thị dbt document/lineage lightwieght (chưa áp dụng thì chưa hỗ trợ cho dbt-clickhouse)
+- Có thể search để lấy thêm thông tin về dữ liệu
+- Dữ liệu được mô tả cụ thể (data type, lineage, data source, owner, tag, ...)
+- Là nơi tổng hợp tài liệu, ghi chép, cách hiểu về dữ liệu của doanh nghiệp
+
+Lợi ích:
+
+- Ổn hơn so với Datahub nếu không cần real-time Data Catalog
+- Cần ít resource
+
+Giới hạn:
+
+- Column-level lineage cho DBT-ClickHouse dường như chưa tốt lắm (chưa parsing đc sql script tốt, cột có cột không)
+
+### 1.6. dbt-colibri
+
+Lợi ích:
+
+- dbt-colibri là dự án open source giúp hiển thị dbt document/lineage lightwieght
+
+Giới hạn:
+
+- Mới xuất hiện, chưa hỗ trợ nhiều, cộng đồng nhỏ, contributor ít
+- Chỉ phù hơp nếu chỉ dùng mỗi DBT (không thể làm data catalog cho các service khác)
 
 ## 2. Áp dụng với bộ dữ liệu mẫu
 
@@ -181,3 +205,43 @@ Tổ chức DBT theo quy ước [DBT Convention](https://docs.getdbt.com/best-pr
 ├── docker-compose.yml
 └── requirements.txt
 ```
+
+## 2.3. Data Catalog Integration
+
+Xem cách tích hợp OpenMetadata-DBT-Clickhouse ở file ```./script_ingest_lineage.md```
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/68f809a7-8aa2-4093-8bad-4b7285fd8604" alt="OLTP Data Model">
+</p>
+<p align="center">
+  <strong>Thông tin chi tiết về các databases</strong>
+</p>
+
+<br><br>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/dd85f6c8-1c36-4209-9325-82bc99f637f3" alt="OLTP Data Model">
+</p>
+<p align="center">
+  <strong>Thông tin chi tiết về các tables trong một database</strong>
+</p>
+
+<br><br>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9dfc6955-cef9-4e4b-aae8-623de0fbb1ee" alt="OLTP Data Model">
+</p>
+<p align="center">
+  <strong>Thông tin chi tiết về các columns trong một table</strong>
+</p>
+
+<br><br>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/08aef20f-1423-4b90-aa23-f7212dea5ba3" alt="OLTP Data Model">
+</p>
+<p align="center">
+  <strong>Dataset lineage và Column-level lineage</strong>
+</p>
+
+<br><br>
